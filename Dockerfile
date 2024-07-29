@@ -9,21 +9,13 @@ RUN mkdir tmp
 
 FROM base AS dependencies
 
-# Utiliser temporairement l'utilisateur root pour installer globalement
 USER root
 COPY --chown=node:node ./package*.json ./
-RUN npm install -g @adonisjs/cli
-
-# Revenir à l'utilisateur node pour les autres commandes
-USER node
-RUN npm ci \
-    && rm -rf node_modules \
-    && npm install
-
+RUN npm ci
 COPY --chown=node:node . .
 
 FROM dependencies AS build
-RUN node ace build --production
+RUN node ace build
 
 FROM base AS production
 ENV NODE_ENV=production
