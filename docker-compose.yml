@@ -38,8 +38,7 @@ services:
       - REDIS_HOST=redis
     volumes:
       - ./:/home/node/app
-      - /home/node/app/node_modules
-    command: ["dumb-init", "node", "--inspect=0.0.0.0", "ace", "serve", "--watch"]
+    command: sh -c "npm install && npm run dev"
 
 volumes:
   postgres_volume:
