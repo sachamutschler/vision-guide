@@ -27,5 +27,5 @@ export default await Env.create(new URL('../', import.meta.url), {
   PG_PORT: Env.schema.number(),
   PG_USER: Env.schema.string(),
   PG_PASSWORD: Env.schema.string.optional(),
-  PG_DB_NAME: Env.schema.string()
+  PG_DB_NAME: Env.schema.string(),
 })

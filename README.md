@@ -15,12 +15,20 @@ copy paste .env file from discord (channel note et ressources) in the root proje
 
 # 3.
 
+run the following command :
+
+```bash
+noce ace migration:run
+```
+
+# 4.
+
 run the following command : 
 
 ```bash
 docker compose up
 ```
 
-# 4. 
+# 5. 
 
 all good, you can start to work !
