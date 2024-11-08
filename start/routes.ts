@@ -9,7 +9,8 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
-import AuthController from "#controllers/Users/auth_controller";
+import AuthController from '#controllers/Users/auth_controller'
+import LocalisationController from '#controllers/Localisation/localisation_controller'
 
 router.get('/', async () => {
   const quotes = [
@@ -29,3 +30,5 @@ router.post('/register', [AuthController, 'register']).as('auth.register')
 router.post('/login', [AuthController, 'login']).as('auth.login')
 router.delete('/logout', [AuthController, 'logout']).as('auth.logout').use(middleware.auth())
 router.get('/me', [AuthController, 'me']).as('auth.me').use(middleware.auth())
+router.post('/geocode', [LocalisationController, 'getCoordinates'])
+router.post('/reverse-geocode', [LocalisationController, 'reverseGeocode'])
