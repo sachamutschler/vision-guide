@@ -3,10 +3,7 @@ import fetch from 'node-fetch'
 
 const options = {
   provider: 'opendatafrance' as 'opendatafrance',
-  fetch: fetch, // Use node-fetch here
-  headers: {
-    'User-Agent': 'YourAppName/1.0 (your-email@example.com)',
-  },
+  fetch: fetch,
 }
 
 const geocoder = NodeGeocoder(options)
