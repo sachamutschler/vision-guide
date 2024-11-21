@@ -18,7 +18,7 @@ copy paste .env file from discord (channel note et ressources) in the root proje
 run the following command :
 
 ```bash
-noce ace migration:run
+node ace migration:run
 ```
 
 # 4.
