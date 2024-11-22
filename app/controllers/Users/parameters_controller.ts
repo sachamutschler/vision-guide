@@ -28,11 +28,8 @@ export default class ParametersController {
   public async updateParameters({params, request, response}: HttpContext) {
     try {
       const user = await User.findOrFail(params.id);
-      console.log(user)
       const newParameters = request.input('parameters', {});
-      console.log(newParameters)
       user.parameters = {...user.parameters, ...newParameters};
-      console.log(user.parameters)
       await user.save();
       return response.ok(user.parameters);
     } catch (error) {

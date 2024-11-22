@@ -11,7 +11,6 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import AuthController from "#controllers/Users/auth_controller";
 
-//Routes for the parameters
 import './parameters.routes.js';
 
 
