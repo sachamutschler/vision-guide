@@ -12,6 +12,8 @@ import { middleware } from '#start/kernel'
 import AuthController from '#controllers/Users/auth_controller'
 import LocalisationController from '#controllers/Localisation/localisation_controller'
 import './faq.routes.ts';
+import './parameters.routes.js';
+
 
 router.get('/', async () => {
   const quotes = [
