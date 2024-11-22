@@ -1,6 +1,5 @@
 import vine from '@vinejs/vine';
 
-
 export const createFaqValidator = vine.compile(
   vine.object({
     question: vine.string().trim().minLength(10).maxLength(255),

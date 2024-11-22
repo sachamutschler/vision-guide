@@ -10,7 +10,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import AuthController from "#controllers/Users/auth_controller";
-//Faq controller
 import './faq.routes.ts';
 
 router.get('/', async () => {
