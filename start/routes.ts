@@ -10,7 +10,9 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import AuthController from '#controllers/Users/auth_controller'
+import UsersController from '#controllers/Users/users_controllers'
 import LocalisationController from '#controllers/Localisation/localisation_controller'
+import DevicesController from '#controllers/devices_controller'
 import './faq.routes.ts';
 import './parameters.routes.js';
 
@@ -35,3 +37,15 @@ router.delete('/logout', [AuthController, 'logout']).as('auth.logout').use(middl
 router.get('/me', [AuthController, 'me']).as('auth.me').use(middleware.auth())
 router.post('/geocode', [LocalisationController, 'getCoordinates'])
 router.post('/reverse-geocode', [LocalisationController, 'reverseGeocode'])
+
+router.group(() => {
+  router.group(()=>{
+    router.get('', [DevicesController, 'index']).as('devices.index')
+    router.get('/:id', [DevicesController, 'show']).as('devices.show')
+    router.post('', [DevicesController, 'store']).as('devices.store')
+    router.put('/:id', [DevicesController, 'update']).as('devices.update')
+    router.delete('/:id', [DevicesController, 'destroy']).as('devices.destroy')
+  }).prefix('/devices')
+
+
+}).prefix('/api')
