@@ -63,3 +63,6 @@ jobs:
           SESSION_DRIVER: memory
           CACHE_VIEWS: false
           DRIVE_DISK: local
+          HOST: 0.0.0.0
+          LOG_LEVEL: info
+          PORT: 3333
