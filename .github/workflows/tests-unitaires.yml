@@ -1,0 +1,65 @@
+name: Unit tests
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  japa-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20.16.0']
+
+    container:
+      image: node:${{ matrix.node-version }}
+
+    services:
+      redis:
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: adonis
+          POSTGRES_PASSWORD: adonis
+          POSTGRES_DB: vision_guide
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: node ace test
+        env:
+          DB_CONNECTION: pg
+          PG_HOST: postgres
+          PG_PORT: 5432
+          PG_USER: adonis
+          PG_PASSWORD: adonis
+          PG_DB_NAME: vision-guide
+          REDIS_CONNECTION: local
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
+          REDIS_PASSWORD:
+          APP_KEY: geLsBrIbZmJzNN3ay98d2_JiJdif8t2X
+          NODE_ENV: test
+          ASSETS_DRIVER: fake
+          SESSION_DRIVER: memory
+          CACHE_VIEWS: false
+          DRIVE_DISK: local
