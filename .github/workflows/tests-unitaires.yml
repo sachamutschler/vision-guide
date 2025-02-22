@@ -51,7 +51,7 @@ jobs:
           PG_PORT: 5432
           PG_USER: adonis
           PG_PASSWORD: adonis
-          PG_DB_NAME: vision-guide
+          PG_DB_NAME: vision_guide
           REDIS_CONNECTION: local
           REDIS_HOST: redis
           REDIS_PORT: 6379
@@ -75,7 +75,7 @@ jobs:
           PG_PORT: 5432
           PG_USER: adonis
           PG_PASSWORD: adonis
-          PG_DB_NAME: vision-guide
+          PG_DB_NAME: vision_guide
           REDIS_CONNECTION: local
           REDIS_HOST: redis
           REDIS_PORT: 6379
