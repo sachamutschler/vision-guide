@@ -30,6 +30,16 @@ jobs:
           POSTGRES_USER: adonis
           POSTGRES_PASSWORD: adonis
           POSTGRES_DB: vision_guide
+          HOST: 0.0.0.0
+          LOG_LEVEL: info
+          PORT: 3333
+          PP_KEY: geLsBrIbZmJzNN3ay98d2_JiJdif8t2X
+          PG_HOST: postgres
+          PG_PORT: 5432
+          PG_USER: adonis
+          PG_PASSWORD: adonis
+          PG_DB_NAME: vision-guide
+          NODE_ENV: test
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
