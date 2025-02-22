@@ -32,9 +32,13 @@ export default class DevicesController {
       const device = await Device.create({ name, type, serial_number })
       return response.status(201).json(device)
     } catch (error) {
-      return response.status(400).json({ message: 'Error creating device', error })
+      return response.status(400).json({
+        message: 'Error creating device',
+        error: error.message,
+      })
     }
   }
+
 
   /**
    * Update a device
