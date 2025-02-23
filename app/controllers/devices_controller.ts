@@ -1,49 +1,68 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import Device from '../models/device.js';
+import Device from '../models/device.js'
+import { logger } from '#utils/logger'
+
+const LOG_ID = 'DEVICE_CONTROLLER'
 
 export default class DevicesController {
   /**
-   * Get all devices
+   * GET all devices
+   * Calls `Device.all()`
    */
   public async index({ response }: HttpContext) {
-    const devices = await Device.all()
-    return response.json(devices)
+    logger.info(`${LOG_ID} - Received GET request for all devices`)
+
+    try {
+      const devices = await Device.all()
+      response.json(devices)
+    } catch (error) {
+      logger.error(`${LOG_ID} - Error fetching devices: ${error.message}`)
+      response.status(500).json({ message: 'Failed to retrieve devices' })
+    }
   }
 
   /**
-   * Get a single device
+   * GET a single device by ID
+   * Calls `Device.findOrFail(id)`
    */
   public async show({ params, response }: HttpContext) {
+    logger.info(`${LOG_ID} - Received GET request for device ID: ${params.id}`)
+
     try {
       const device = await Device.findOrFail(params.id)
-      return response.json(device)
+      response.json(device)
     } catch (error) {
-      return response.status(404).json({ message: 'Device not found' })
+      logger.warn(`${LOG_ID} - Device not found with ID: ${params.id}`)
+      response.status(404).json({ message: 'Device not found' })
     }
   }
 
   /**
-   * Create a new device
+   * POST create a new device
+   * Calls `Device.create()`
    */
   public async store({ request, response }: HttpContext) {
-    const { name, type, serial_number } = request.only(['name', 'type', 'serial_number'])
+    logger.info(`${LOG_ID} - Received POST request to create a new device`)
 
     try {
+      const { name, type, serial_number } = request.only(['name', 'type', 'serial_number'])
       const device = await Device.create({ name, type, serial_number })
-      return response.status(201).json(device)
+
+      logger.info(`${LOG_ID} - Device created successfully with ID: ${device.id}`)
+      response.status(201).json(device)
     } catch (error) {
-      return response.status(400).json({
-        message: 'Error creating device',
-        error: error.message,
-      })
+      logger.error(`${LOG_ID} - Error creating device: ${error.message}`)
+      response.status(400).json({ message: 'Error creating device', error: error.message })
     }
   }
 
-
   /**
-   * Update a device
+   * PUT update an existing device by ID
+   * Calls `Device.findOrFail(id)` and updates its properties
    */
   public async update({ params, request, response }: HttpContext) {
+    logger.info(`${LOG_ID} - Received PUT request to update device ID: ${params.id}`)
+
     try {
       const device = await Device.findOrFail(params.id)
       const { name, type, serial_number } = request.only(['name', 'type', 'serial_number'])
@@ -51,22 +70,30 @@ export default class DevicesController {
       device.merge({ name, type, serial_number })
       await device.save()
 
-      return response.json(device)
+      logger.info(`${LOG_ID} - Device updated successfully with ID: ${params.id}`)
+      response.json(device)
     } catch (error) {
-      return response.status(404).json({ message: 'Device not found' })
+      logger.warn(`${LOG_ID} - Failed to update device. Device not found with ID: ${params.id}`)
+      response.status(404).json({ message: 'Device not found' })
     }
   }
 
   /**
-   * Delete a device
+   * DELETE a device by ID
+   * Calls `Device.findOrFail(id)` and deletes it
    */
   public async destroy({ params, response }: HttpContext) {
+    logger.info(`${LOG_ID} - Received DELETE request for device ID: ${params.id}`)
+
     try {
       const device = await Device.findOrFail(params.id)
       await device.delete()
-      return response.status(204)
+
+      logger.info(`${LOG_ID} - Device deleted successfully with ID: ${params.id}`)
+      response.noContent()
     } catch (error) {
-      return response.status(404).json({ message: 'Device not found' })
+      logger.warn(`${LOG_ID} - Device not found for deletion with ID: ${params.id}`)
+      response.status(404).json({ message: 'Device not found' })
     }
   }
 }
