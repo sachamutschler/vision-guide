@@ -49,6 +49,9 @@
     "@types/luxon": "^3.4.2",
     "@types/node": "^20.14.9",
     "@types/node-geocoder": "^4.2.6",
+    "@types/sinon": "^17.0.4",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "eslint": "^8.57.0",
     "hot-hook": "^0.2.6",
     "pino-pretty": "^11.2.1",
@@ -67,6 +70,9 @@
     "node-geocoder": "^4.4.0",
     "pg": "^8.12.0",
     "reflect-metadata": "^0.2.2",
+    "sinon": "^19.0.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.17.0"
   },
   "hotHook": {
