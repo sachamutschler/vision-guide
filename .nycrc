@@ -1,0 +1,12 @@
+{
+  "exclude": [
+    "tests/**/*.ts",
+    "database/**/*.ts",
+    "config/**/*.ts",
+    "bin/*.ts",
+    "start/**/*.ts",
+    "app/models/user.ts",
+    "app/utils/logger.ts",
+    "app/controllers/swagger_controller.ts"
+  ]
+}
