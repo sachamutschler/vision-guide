@@ -82,18 +82,29 @@ export default class DevicesController {
    * DELETE a device by ID
    * Calls `Device.findOrFail(id)` and deletes it
    */
+  /**
+   * DELETE a device by ID
+   * Calls `Device.findOrFail(id)`, returns it, and then deletes it
+   */
   public async destroy({ params, response }: HttpContext) {
     logger.info(`${LOG_ID} - Received DELETE request for device ID: ${params.id}`)
 
     try {
       const device = await Device.findOrFail(params.id)
+
+      // Store the device data to return it
+      const deviceData = device.toJSON()
+
+      // Delete the device
       await device.delete()
 
       logger.info(`${LOG_ID} - Device deleted successfully with ID: ${params.id}`)
-      response.noContent()
+
+      // Return the deleted device data
+      return response.status(200).json(deviceData)
     } catch (error) {
       logger.warn(`${LOG_ID} - Device not found for deletion with ID: ${params.id}`)
-      response.status(404).json({ message: 'Device not found' })
+      return response.status(404).json({ message: 'Device not found' })
     }
   }
 }

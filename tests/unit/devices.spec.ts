@@ -35,6 +35,17 @@ test.group('Device Controller Unit Tests', (group) => {
       { id: 1, name: 'Sensor X', type: 'Temperature', serial_number: 'SN123' },
     ])
   })
+  test('should return 500 if fetching devices fails', async ({ assert }) => {
+    sandbox.stub(Device, 'all').rejects(new Error('Database error'))
+    const fakeResponse = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.spy(),
+    }
+    const controller = new DevicesController()
+    await controller.index({ response: fakeResponse } as any)
+    assert.isTrue(fakeResponse.status.calledOnceWith(500))
+    assert.deepEqual(fakeResponse.json.firstCall.args[0], { message: 'Failed to retrieve devices' })
+  })
 
   /**
    * Test: Get a single device
@@ -119,19 +130,29 @@ test.group('Device Controller Unit Tests', (group) => {
   /**
    * Test: Delete a device
    */
-  test('should delete a device', async ({ assert }) => {
-    const device:Partial<Device> = { id: 1, delete: sinon.stub().resolves() }
+  test('should delete a device and return it', async ({ assert }) => {
+    const deviceData = { id: 1, name: 'Test Device', type: 'sensor' }
+    const device = {
+      id: 1,
+      delete: sinon.stub().resolves(),
+      toJSON: sinon.stub().returns(deviceData)
+    }
 
-    sandbox.stub(Device, 'findOrFail').resolves(device as Device)
+    sandbox.stub(Device, 'findOrFail').resolves(device as unknown as Device)
 
     const controller = new DevicesController()
-    const fakeResponse = { status: sinon.stub().returnsThis(), send: sinon.spy() }
+    const fakeResponse = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.spy()
+    }
     const fakeParams = { id: 1 }
 
     await controller.destroy({ params: fakeParams, response: fakeResponse } as any)
 
-    assert.isTrue(fakeResponse.status.calledOnceWith(204))
+    assert.isTrue(fakeResponse.status.calledOnceWith(200))
+    assert.isTrue(fakeResponse.json.calledOnceWith(deviceData))
   })
+
 
   /**
    * Test: Delete a device (Not Found)
