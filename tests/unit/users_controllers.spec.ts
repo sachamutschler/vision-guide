@@ -3,7 +3,8 @@ import sinon from 'sinon'
 import UsersController from '../../app/controllers/Users/users_controllers.js'
 import User from '../../app/models/user.js'
 import { logger } from '#utils/logger'
-
+import Device from "#models/device";
+import vine from '@vinejs/vine'
 test.group('UsersController Unit Tests', (group) => {
   let sandbox: sinon.SinonSandbox
 
@@ -197,5 +198,81 @@ test.group('UsersController Unit Tests', (group) => {
 
     assert.isTrue(fakeResponse.status.calledOnceWith(404))
     assert.deepEqual(fakeResponse.json.firstCall.args[0], { message: 'User not found' })
+  })
+  /** ✅ Test: Associate device with authenticated user */
+  test('should associate a device with the authenticated user', async ({ assert }) => {
+    const devicePayload = {
+      name: 'iPhone',
+      type: 'smartphone',
+      serial_number: 'ABC123XYZ'
+    }
+
+    const authUser = { id: 1 }
+
+    const fakeRequest = {
+      body: sinon.stub().resolves(devicePayload)
+    }
+
+    const fakeResponse = { created: sinon.spy() }
+
+    sandbox.stub(vine, 'compile').returns({
+      validate: sinon.stub().resolves(devicePayload)
+    } as any)
+
+    const fakeDevice = { id: 1, ...devicePayload, userId: authUser.id }
+    sandbox.stub(Device, 'create').resolves(fakeDevice as any)
+
+    const controller = new UsersController()
+
+    await controller.associateDevice({ auth: { user: authUser }, request: fakeRequest, response: fakeResponse } as any)
+
+    assert.isTrue(fakeResponse.created.calledOnceWith(fakeDevice))
+  })
+
+  /** ❌ Test: Associate device without authentication */
+  test('should return 400 if user is not authenticated when associating a device', async ({ assert }) => {
+    const controller = new UsersController()
+    const fakeRequest = { body: sinon.stub().resolves({}) }
+    const fakeResponse = { status: sinon.stub().returnsThis(), json: sinon.spy() }
+
+    await controller.associateDevice({ auth: { user: null }, request: fakeRequest, response: fakeResponse } as any)
+
+    assert.isTrue(fakeResponse.status.calledOnceWith(400))
+    assert.match(fakeResponse.json.firstCall.args[0].message, /Error associating device/)
+  })
+
+  /** ✅ Test: Get devices for authenticated user */
+  test('should return devices for authenticated user', async ({ assert }) => {
+    const authUser = { id: 1 }
+    const devices = [
+      { id: 1, name: 'Laptop' },
+      { id: 2, name: 'Tablet' }
+    ]
+
+    const fakeUserWithDevices = { devices }
+
+    sandbox.stub(User, 'query').returns({
+      where: sinon.stub().returnsThis(),
+      preload: sinon.stub().returnsThis(),
+      firstOrFail: sinon.stub().resolves(fakeUserWithDevices)
+    } as any)
+
+    const fakeResponse = { ok: sinon.spy() }
+    const controller = new UsersController()
+
+    await controller.getUserDevices({ auth: { user: authUser }, response: fakeResponse } as any)
+
+    assert.isTrue(fakeResponse.ok.calledOnceWith(devices))
+  })
+
+  /** ❌ Test: Get devices without authentication */
+  test('should return 500 if user is not authenticated when fetching devices', async ({ assert }) => {
+    const controller = new UsersController()
+    const fakeResponse = { status: sinon.stub().returnsThis(), json: sinon.spy() }
+
+    await controller.getUserDevices({ auth: { user: null }, response: fakeResponse } as any)
+
+    assert.isTrue(fakeResponse.status.calledOnceWith(500))
+    assert.match(fakeResponse.json.firstCall.args[0].message, /Error retrieving user devices/)
   })
 })
