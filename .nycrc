@@ -6,6 +6,7 @@
     "bin/*.ts",
     "start/**/*.ts",
     "app/models/user.ts",
+    "app/models/device.ts",
     "app/utils/logger.ts",
     "app/controllers/swagger_controller.ts"
   ]
