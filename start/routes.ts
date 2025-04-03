@@ -8,7 +8,7 @@
 */
 
 import router from '@adonisjs/core/services/router'
-import { middleware } from '#start/kernel'
+import {middleware} from '#start/kernel'
 import AuthController from '#controllers/Users/auth_controller'
 import UsersController from '#controllers/Users/users_controllers'
 import LocalisationController from '#controllers/Localisation/localisation_controller'
@@ -481,6 +481,68 @@ router.group(() => {
      */
     router.delete('/:id', [UsersController, 'destroy']).as('users.destroy')
   }).prefix('/users')
+
+  router.group(() => {
+    /**
+     * @openapi
+     * /api/user/devices:
+     *   post:
+     *     summary: Associate a device with authenticated user
+     *     description: Creates a new device and associates it with the currently authenticated user.
+     *     tags:
+     *       - User Devices
+     *     security:
+     *       - bearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               name:
+     *                 type: string
+     *                 example: "My iPhone"
+     *               type:
+     *                 type: number
+     *                 example: 1
+     *               serial_number:
+     *                 type: string
+     *                 example: "ABC123XYZ"
+     *     responses:
+     *       201:
+     *         description: Device created and associated successfully.
+     *       400:
+     *         description: Error associating device.
+     *       401:
+     *         description: User not authenticated.
+     */
+    router.post('', [UsersController, 'associateDevice'])
+      .as('user.devices.associate')
+      .use(middleware.auth())
+
+    /**
+     * @openapi
+     * /api/user/devices:
+     *   get:
+     *     summary: Get all devices for authenticated user
+     *     description: Returns a list of all devices associated with the currently authenticated user.
+     *     tags:
+     *       - User Devices
+     *     security:
+     *       - bearerAuth: []
+     *     responses:
+     *       200:
+     *         description: A list of user's devices.
+     *       401:
+     *         description: User not authenticated.
+     *       500:
+     *         description: Error retrieving user devices.
+     */
+    router.get('', [UsersController, 'getUserDevices'])
+      .as('user.devices.list')
+      .use(middleware.auth())
+  }).prefix('/user/devices')
 }).prefix('/api')
 
 export default router

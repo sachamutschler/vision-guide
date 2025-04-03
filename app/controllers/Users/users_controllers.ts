@@ -1,6 +1,9 @@
 import User from '../../models/user.js';
 import type { HttpContext } from '@adonisjs/core/http'
 import { logger } from '#utils/logger'
+import {deviceSchema} from '#validators/device'
+import Device from "#models/device";
+import vine from '@vinejs/vine'
 
 const LOG_ID = 'USERS_CONTROLLER'
 
@@ -90,6 +93,57 @@ export default class UsersController {
     } catch (error) {
       logger.warn(`${LOG_ID} - Failed to delete user. User not found with ID: ${params.id}`)
       return response.status(404).json({ message: 'User not found' })
+    }
+  }
+
+  /**
+   *  Associates a device with the authenticated user
+   */
+  async associateDevice({ auth, request, response }: HttpContext) {
+    try {
+      logger.info(`${LOG_ID} - Associating device with user`)
+
+      if (!auth.user) {
+        throw new Error('User not authenticated')
+      }
+
+      const validator = vine.compile(deviceSchema)
+      const payload = await validator.validate(request.body())
+
+      const device = await Device.create({
+        name: payload.name,
+        type: payload.type,
+        serial_number: payload.serial_number,
+        userId: auth.user.id
+      })
+
+      return response.created(device)
+    } catch (error) {
+      logger.error(`${LOG_ID} - Device association failed: ${error.message}`)
+      return response.status(400).json({ message: 'Error associating device', error: error.message })
+    }
+  }
+
+  /**
+   * Gets all devices for the authenticated user
+   */
+  async getUserDevices({ auth, response }: HttpContext) {
+    try {
+      logger.info(`${LOG_ID} - Fetching user devices`)
+
+      if (!auth.user) {
+        throw new Error('User not authenticated')
+      }
+
+      const user = await User.query()
+        .where('id', auth.user.id)
+        .preload('devices')
+        .firstOrFail()
+
+      return response.ok(user.devices)
+    } catch (error) {
+      logger.error(`${LOG_ID} - Fetching user devices failed: ${error.message}`)
+      return response.status(500).json({ message: 'Error retrieving user devices', error: error.message })
     }
   }
 }
